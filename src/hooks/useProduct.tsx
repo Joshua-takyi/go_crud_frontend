@@ -13,8 +13,8 @@ export interface ProductProps {
   tags: string[];
   completed: boolean;
   metadata: {
-    createdAt?: string;
-    updatedAt?: string;
+    created_at?: Date | string;
+    updated_at?: Date | string;
   };
   priority: 'low' | 'medium' | 'high';
 }
@@ -28,7 +28,15 @@ export interface ProductFormData {
   completed?: boolean;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL =
+  process.env.NODE_ENV === 'production'
+    ? process.env.NEXT_PUBLIC_API_URL_PROD || 'https://go-rest-testing.onrender.com/api/v1'
+    : process.env.NEXT_PUBLIC_API_URL_DEV || 'http://localhost:8080/api/v1';
+
+// Log API URL for debugging
+if (typeof window !== 'undefined') {
+  console.debug('API URL configured as:', API_URL);
+}
 
 export default function useProduct() {
   const queryClient = useQueryClient();

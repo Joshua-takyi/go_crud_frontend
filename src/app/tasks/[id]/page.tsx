@@ -85,6 +85,11 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
       high: 'bg-priority-high',
     }[task.priority as 'low' | 'medium' | 'high'] || 'bg-gray-500';
 
+  const createdAt = new Date(task.metadata.created_at).toLocaleString();
+  const updatedAt = task.metadata.updated_at
+    ? new Date(task.metadata.updated_at).toLocaleString()
+    : null;
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -137,13 +142,9 @@ export default function TaskDetailPage({ params }: TaskDetailPageProps) {
                   >
                     {task.completed ? 'Completed' : 'In Progress'}
                   </span>
-                  <span className="text-xs text-gray-500 ml-2">
-                    Created: {new Date(task.metadata.createdAt || '').toLocaleString()}
-                  </span>
-                  {task.metadata.updatedAt && (
-                    <span className="text-xs text-gray-500 ml-2">
-                      Updated: {new Date(task.metadata.updatedAt).toLocaleString()}
-                    </span>
+                  <span className="text-xs text-gray-500 ml-2">Created: {createdAt}</span>
+                  {updatedAt && (
+                    <span className="text-xs text-gray-500 ml-2">Updated: {updatedAt}</span>
                   )}
                 </div>
               </div>
