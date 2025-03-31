@@ -60,14 +60,14 @@ export default function TaskCard({ task, onDelete, onToggleComplete }: TaskCardP
     }[task.priority] || 'bg-gray-500';
 
   // Format date for better readability
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
+  const formatDate = (dateInput?: string | Date) => {
+    if (!dateInput) return '';
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   // Create date for display
-  const createdDate = formatDate(task.metadata?.createdAt);
+  const createdDate = formatDate(task.metadata?.created_at);
 
   return (
     <div className="group bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 transition-all  hover:translate-y-[-2px] duration-300">
