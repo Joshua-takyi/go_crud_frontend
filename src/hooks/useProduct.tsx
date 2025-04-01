@@ -28,10 +28,23 @@ export interface ProductFormData {
   completed?: boolean;
 }
 
+export interface PaginationMetadata {
+  hasMore: boolean;
+  limit: number;
+  page: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface TasksResponse {
+  tasks: ProductProps[];
+  pagination: PaginationMetadata;
+}
+
 const API_URL =
   process.env.NODE_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_API_URL_PROD || 'https://go-rest-testing.onrender.com/api/v1'
-    : process.env.NEXT_PUBLIC_API_URL_DEV || 'http://localhost:8080/api/v1';
+    ? process.env.NEXT_PUBLIC_API_URL_PROD
+    : process.env.NEXT_PUBLIC_API_URL_DEV;
 
 // Log API URL for debugging
 if (typeof window !== 'undefined') {
@@ -41,19 +54,26 @@ if (typeof window !== 'undefined') {
 export default function useProduct() {
   const queryClient = useQueryClient();
 
-  // Get all products
-  const getAllProducts = useQuery({
-    queryKey: ['products'],
-    queryFn: async () => {
-      try {
-        const res = await axios.get(`${API_URL}/tasks`);
-        return res.data.tasks;
-      } catch (error) {
-        const axiosError = error as AxiosError;
-        throw new Error(axiosError.message || 'Failed to fetch tasks');
-      }
-    },
-  });
+  // Get all products with pagination
+  const useAllProducts = (page = 1, limit = 10) => {
+    return useQuery({
+      queryKey: ['products', page, limit],
+      queryFn: async () => {
+        try {
+          const res = await axios.get(`${API_URL}/tasks`, {
+            params: { page, limit },
+          });
+          return {
+            tasks: res.data.tasks,
+            pagination: res.data.pagination,
+          } as TasksResponse;
+        } catch (error) {
+          const axiosError = error as AxiosError;
+          throw new Error(axiosError.message || 'Failed to fetch tasks');
+        }
+      },
+    });
+  };
 
   // Get single product
   const useProductById = (id: string) => {
@@ -139,7 +159,7 @@ export default function useProduct() {
   });
 
   return {
-    getAllProducts,
+    useAllProducts,
     useProductById,
     createProduct,
     updateProduct,
